@@ -22,22 +22,22 @@ const New = () => {
 		const [
 			nameElem,
 			polElem,
-			floorElem
+			floorElem,
+			colorElem
 		] = e.target.elements
 
 		const name = nameElem.value
 		const pol = polElem.value
 		const floor = floorElem.value
+		const color = colorElem.value
 
 		setUsers([
 			...users, {
 				id: uuidv4(),
 				name,
 				pol: parseInt(pol),
-				currentPol: [],
 				floor: parseInt(floor),
-				currentFloor: [],
-				color: "green"
+				color
 			}
 		])
 		setOpen(false)
@@ -162,6 +162,25 @@ const New = () => {
 							type="number" 
 							id="floor" 
 							name="floor" 
+							required
+						/>
+						<label 
+							style={{ 
+								margin: 7, 
+								marginBottom: 0 
+							}} 
+							htmlFor="floor"
+						>
+							Renk:
+						</label>
+						<input 
+							style={{ 
+								margin: 7 
+							}} 
+							type="color" 
+							id="color" 
+							name="color" 
+							defaultValue={`#${Math.floor(Math.random()*16777215).toString(16)}`}
 							required
 						/>
 						<div 

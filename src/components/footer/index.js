@@ -8,12 +8,18 @@ import New from "./new";
 const Footer = () => {
 
 	const {
-		selectedDay,
+		// selectedDay,
+		polItems,
+		setPolItems,
+		floorItems,
+		setFloorItems,
 		setSelectedDay,
 		selectedUser,
 		setSelectedUser,
 		users,
-		setUsers
+		setUsers,
+		remainingFloor,
+		remainingPol
 	} = React.useContext(Context)
 
 	const handleDeleteUser = (user) => (e) => {
@@ -21,8 +27,36 @@ const Footer = () => {
 		if (window.confirm('Silmek istediginden emin misin?')) {
 			setUsers(users.filter(u => user.id !== u.id))
 			setSelectedUser(null)
+
+			const newPolItems = {...polItems}
+			Object.keys(polItems).forEach(day => {
+				newPolItems[day] = newPolItems[day].filter(u => u.id !== user.id)
+			})
+			setPolItems(newPolItems)
+
+			const newFloorItems = {...floorItems}
+			Object.keys(floorItems).forEach(day => {
+				newFloorItems[day] = newFloorItems[day].filter(u => u.id !== user.id)
+			})
+			setFloorItems(newFloorItems)
 		}
 	}
+
+	// const remainingFloor = (user) => {
+	// 	let count = 0
+	// 	Object.keys(floorItems).forEach(date => {
+	// 		count += floorItems[date].filter(u => u.id === user.id).length
+	// 	})
+	// 	return user.floor - count
+	// }
+
+	// const remainingPol = (user) => {
+	// 	let count = 0
+	// 	Object.keys(polItems).forEach(date => {
+	// 		count += polItems[date].filter(u => u.id === user.id).length
+	// 	})
+	// 	return user.pol - count
+	// }
 
 	return (
 		<footer
@@ -43,59 +77,67 @@ const Footer = () => {
 					padding: '7px'
 				}}
 			>
-				{users.map((user, i) => (
-					<div 
-						key={i}
-						style={{
-							float: 'left',
-							paddingLeft: '7px',
-							margin: '3px',
-							background: user.color,
-							minWidth: 55,
-							borderRadius: '5px',
-							color: 'white',
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-							boxShadow: selectedUser && selectedUser.id === user.id && '0 0 0 1px black',
-							border: '1px solid white',
-							opacity: (user.floor - user.currentFloor.length === 0 && user.pol - user.currentPol.length === 0) && .5
-						}}
-						onClick={(e) => {
-							e.stopPropagation()
-							setSelectedUser(user)
-						}}
-					>
-						<span
+				{users && users.length > 0 ? users.map((user, i) => {
+					const disabled = remainingFloor(user) <= 0 && remainingPol(user) <= 0
+					return (
+						<div 
+							key={i}
 							style={{
-								textDecoration: (user.floor - user.currentFloor.length === 0 && user.pol - user.currentPol.length === 0) && 'line-through'
-							}}
-						>
-							{user.name}
-						</span>
-						<div
-							style={{
+								float: 'left',
+								paddingLeft: '7px',
+								margin: '3px',
+								background: user.color,
+								minWidth: 55,
+								borderRadius: '5px',
+								color: 'white',
 								display: 'flex',
-								flexDirection: 'column',
-								fontSize: 7,
-								marginLeft: 3
+								justifyContent: 'space-between',
+								alignItems: 'center',
+								boxShadow: selectedUser && selectedUser.id === user.id && '0 0 0 1px black',
+								border: '1px solid white',
+								opacity: disabled && .5
+							}}
+							onClick={(e) => {
+								e.stopPropagation()
+								if (!disabled) {
+									setSelectedUser(user)
+									setSelectedDay(null)
+								}
 							}}
 						>
 							<span>
-								{user.floor - user.currentFloor.length}
+								{user.name}
 							</span>
-							<span>
-								{user.pol - user.currentPol.length}
-							</span>
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'column',
+									fontSize: 7,
+									marginLeft: 3
+								}}
+							>
+								<span>
+									{remainingFloor(user)}
+								</span>
+								<span>
+									{remainingPol(user)}
+								</span>
+							</div>
+							<MdClose 
+								onClick={handleDeleteUser(user)}
+								style={{
+									padding: 7,
+								}}
+							/>
 						</div>
-						<MdClose 
-							onClick={handleDeleteUser(user)}
-							style={{
-								padding: 7,
-							}}
-						/>
-					</div>
-				))}
+					)
+				}) : (
+					<span style={{
+						color: 'grey'
+					}}>
+						Kisi eklemek icin yandaki arti butonuna bas
+					</span>
+				)}
 			</div>
 			<div
 				style={{
@@ -119,7 +161,7 @@ const Footer = () => {
 						style={{
 							width: 5,
 							height: 5,
-							background: 'grey',
+							background: 'darkgrey',
 							marginRight: 2,
 							border: '1px solid black'
 						}}

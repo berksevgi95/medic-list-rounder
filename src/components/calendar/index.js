@@ -6,7 +6,8 @@ const Calendar = ({
 	month,
 	year,
 	onDaySelected,
-	selectedDay
+	selectedDay,
+	items
 }) => {
 
 	const [momentObj, setMomentObj] = React.useState(moment(`${year}-${month}`, "YYYY-MM"))
@@ -55,6 +56,9 @@ const Calendar = ({
 			const floorSelected = selectedDay && selectedDay.floor && selectedDay.floor.isSame(day)
 			const polSelected = selectedDay && selectedDay.pol && selectedDay.pol.isSame(day)
 
+			const floorItems = (items && items.floor && items.floor[day.format('DD/MM/YYYY')]) || []
+			const polItems = (items && items.pol && items.pol[day.format('DD/MM/YYYY')]) || []
+			
 			return (
 				<div
 					key={i}
@@ -82,16 +86,13 @@ const Calendar = ({
 						style={{
 							flex: 1,
 							textAlign: 'center',
-							background: 'grey',
-							border: `2px solid ${floorSelected ? "black" : 'grey'}`
+							background: 'darkgrey',
+							border: `2px solid ${floorSelected ? "black" : 'darkgrey'}`,
+							overflow: 'auto',
+							padding: 2
 						}}
 						onClick={() => {
 							if (onDaySelected) {
-								// onDaySelected(floorSelected ? null : {
-								// 	floor: day,
-								// 	pol: null,
-								// })
-
 								onDaySelected({
 									floor: day,
 									pol: null,
@@ -99,22 +100,50 @@ const Calendar = ({
 							}
 						}}
 					>
-	
+						<div
+							style={{
+								height: 15
+							}}
+						/>
+						{floorItems.map((item, i) => (
+							<div 
+								key={i}
+								style={{
+									width: '100%',
+									float: 'left',
+									borderRadius: '2px',
+									padding: 2,
+									color: 'white',
+									background: item.color,
+									marginBottom: 2,
+									boxSizing: 'border-box',
+								}}
+							>
+								<span
+									style={{
+										overflow: 'hidden',
+										display: 'block',
+										whiteSpace: 'nowrap',
+										textOverflow: 'ellipsis',
+										fontSize: 7
+									}}
+								>
+									{item.name}
+								</span>
+							</div>
+						))}
 					</div>
 					<div
 						style={{
 							flex: 1,
 							textAlign: 'center',
 							background: 'lightgrey',
-							border: `2px solid ${polSelected ? "black" : 'lightgrey'}`
+							border: `2px solid ${polSelected ? "black" : 'lightgrey'}`,
+							overflow: 'auto',
+							padding: 2
 						}}
 						onClick={() => {
 							if (onDaySelected) {
-								// onDaySelected(polSelected ? null : {
-								// 	floor: null,
-								// 	pol: day,
-								// })
-
 								onDaySelected({
 									floor: null,
 									pol: day,
@@ -122,7 +151,33 @@ const Calendar = ({
 							}
 						}}
 					>
-	
+						{polItems.map((item, i) => (
+							<div 
+								key={i}
+								style={{
+									width: '100%',
+									float: 'left',
+									borderRadius: '2px',
+									padding: 2,
+									color: 'white',
+									background: item.color,
+									marginBottom: 2,
+									boxSizing: 'border-box',
+								}}
+							>
+								<span
+									style={{
+										overflow: 'hidden',
+										display: 'block',
+										whiteSpace: 'nowrap',
+										textOverflow: 'ellipsis',
+										fontSize: 7
+									}}
+								>
+									{item.name}
+								</span>
+							</div>
+						))}
 					</div>
 				</div>
 			)

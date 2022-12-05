@@ -13,6 +13,10 @@ const Header = () => {
 		setSelectedDay,
 		selectedUser,
 		setSelectedUser,
+		floorItems,
+		setFloorItems,
+		polItems,
+		setPolItems,
 		year,
 		setYear,
 		month,
@@ -44,6 +48,64 @@ const Header = () => {
 							selectedDay.pol.format('DD/MM/YYYY') : 
 						''}
 					</span>
+					<div
+						style={{
+							flex: 1,
+							overflowY: 'auto',
+							display: 'flex'
+						}}
+					>
+						{((selectedDay.floor && floorItems[selectedDay.floor.format('DD/MM/YYYY')])
+							|| (selectedDay.pol && polItems[selectedDay.pol.format('DD/MM/YYYY')])
+							|| []
+						).map((user, i) => (
+							<div 
+								key={i}
+								style={{
+									paddingLeft: '7px',
+									margin: '3px',
+									background: user.color,
+									borderRadius: '5px',
+									color: 'white',
+									display: 'flex',
+									justifyContent: 'space-between',
+									alignItems: 'center',
+									border: '1px solid white',
+								}}
+							>
+								<span
+									style={{
+										overflow: 'hidden',
+										display: 'block',
+										whiteSpace: 'nowrap',
+										textOverflow: 'ellipsis',
+									}}
+								>
+									{user.name}
+								</span>
+								<MdClose
+									onClick={() => {
+										if (selectedDay && selectedDay.floor) {
+											const date = selectedDay.floor.format('DD/MM/YYYY')
+											setFloorItems({
+												...floorItems,
+												[date]: [...(floorItems[date] || []).filter(u => u.id !== user.id)]
+											})
+										} else if (selectedDay && selectedDay.pol) {
+											const date = selectedDay.pol.format('DD/MM/YYYY')
+											setPolItems({
+												...polItems,
+												[date]: [...(polItems[date] || []).filter(u => u.id !== user.id)]
+											})
+										}
+									}}
+									style={{
+										padding: 7,
+									}}
+								/>
+							</div>
+						))}
+					</div>
 					<MdClose
 						style={{
 							fontSize: 20,
