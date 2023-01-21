@@ -7,7 +7,8 @@ const Calendar = ({
 	year,
 	onDaySelected,
 	selectedDay,
-	items
+	items,
+	dateTemplate
 }) => {
 
 	const [momentObj, setMomentObj] = React.useState(moment(`${year}-${month}`, "YYYY-MM"))
@@ -52,19 +53,13 @@ const Calendar = ({
 			.map((_, day) => moment(`${momentObj.format("Y")}-${momentObj.format("M")}-${day + 1}`, "YYYY-MM-DD"))
 
 		return days.map((day, i) => {
-
-			const floorSelected = selectedDay && selectedDay.floor && selectedDay.floor.isSame(day)
-			const polSelected = selectedDay && selectedDay.pol && selectedDay.pol.isSame(day)
-
-			const floorItems = (items && items.floor && items.floor[day.format('DD/MM/YYYY')]) || []
-			const polItems = (items && items.pol && items.pol[day.format('DD/MM/YYYY')]) || []
 			
 			return (
 				<div
 					key={i}
 					style={{
 						width: `calc(100% / 7)`,
-						height: 100,
+						minHeight: 100,
 						float: "left",
 						position: 'relative',
 						display: 'flex',
@@ -77,108 +72,70 @@ const Calendar = ({
 							left: 0,
 							top: 0,
 							margin: 0,
-							padding: 0
+							padding: 0,
+							color: dateTemplate && dateTemplate[0].color,
+							filter: "invert(100%)"
 						}}
 					>
 						{day.date()}
 					</h3>
-					<div
-						style={{
-							flex: 1,
-							textAlign: 'center',
-							background: 'darkgrey',
-							border: `2px solid ${floorSelected ? "black" : 'darkgrey'}`,
-							overflow: 'auto',
-							padding: 2
-						}}
-						onClick={() => {
-							if (onDaySelected) {
-								onDaySelected({
-									floor: day,
-									pol: null,
-								})
-							}
-						}}
-					>
-						<div
-							style={{
-								height: 15
-							}}
-						/>
-						{floorItems.map((item, i) => (
-							<div 
+					{dateTemplate && dateTemplate.length > 0 && dateTemplate.map((dt, i) => {
+						const dateItems = (items[dt.name] || [])[day.format('DD/MM/YYYY')] || []
+						const selected = selectedDay && selectedDay[dt.name] && selectedDay[dt.name].isSame(day)
+						return (
+							<div
 								key={i}
 								style={{
-									width: '100%',
-									float: 'left',
-									borderRadius: '2px',
-									padding: 2,
-									color: 'white',
-									background: item.color,
-									marginBottom: 2,
-									boxSizing: 'border-box',
+									height: 50,
+									textAlign: 'center',
+									background: dt.color,
+									border: `2px solid ${selected ? "black" : 'transparent'}`,
+									overflow: 'auto',
+									padding: 2
+								}}
+								onClick={() => {
+									if (onDaySelected) {
+										onDaySelected({
+											[dt.name]: day
+										})
+									}
 								}}
 							>
-								<span
+								<div
 									style={{
-										overflow: 'hidden',
-										display: 'block',
-										whiteSpace: 'nowrap',
-										textOverflow: 'ellipsis',
-										fontSize: 7
+										height: 15
 									}}
-								>
-									{item.name}
-								</span>
+								/>
+								{dateItems.map((item, i) => (
+									<div 
+										key={i}
+										style={{
+											width: '100%',
+											float: 'left',
+											borderRadius: '2px',
+											padding: 2,
+											color: 'white',
+											background: item.color,
+											marginBottom: 2,
+											boxSizing: 'border-box',
+										}}
+									>
+										<span
+											style={{
+												overflow: 'hidden',
+												display: 'block',
+												whiteSpace: 'nowrap',
+												textOverflow: 'ellipsis',
+												fontSize: 7
+											}}
+										>
+											{item.name}
+										</span>
+									</div>
+								))}
 							</div>
-						))}
-					</div>
-					<div
-						style={{
-							flex: 1,
-							textAlign: 'center',
-							background: 'lightgrey',
-							border: `2px solid ${polSelected ? "black" : 'lightgrey'}`,
-							overflow: 'auto',
-							padding: 2
-						}}
-						onClick={() => {
-							if (onDaySelected) {
-								onDaySelected({
-									floor: null,
-									pol: day,
-								})
-							}
-						}}
-					>
-						{polItems.map((item, i) => (
-							<div 
-								key={i}
-								style={{
-									width: '100%',
-									float: 'left',
-									borderRadius: '2px',
-									padding: 2,
-									color: 'white',
-									background: item.color,
-									marginBottom: 2,
-									boxSizing: 'border-box',
-								}}
-							>
-								<span
-									style={{
-										overflow: 'hidden',
-										display: 'block',
-										whiteSpace: 'nowrap',
-										textOverflow: 'ellipsis',
-										fontSize: 7
-									}}
-								>
-									{item.name}
-								</span>
-							</div>
-						))}
-					</div>
+						)
+					})}
 				</div>
 			)
 		})

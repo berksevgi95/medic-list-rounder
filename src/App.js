@@ -1,95 +1,35 @@
 import React from 'react'
-import './App.css';
-import Calendar from './components/calendar';
-import Header from './components/header';
-import Nav from './components/footer';
-import moment from 'moment';
+import Setup from './view/setup';
+import Main from './view/main';
+
+import { Routes, Route, Navigate } from "react-router-dom";
 
 export const Context = React.createContext()
 
 const App = () => {
 
-  const [users, setUsers] = React.useState([])
-  const [polItems, setPolItems] = React.useState({})
-  const [floorItems, setFloorItems] = React.useState({})
-
-  const [selectedUser, setSelectedUser] = React.useState(null)
-  const [selectedDay, setSelectedDay] = React.useState(null)
-
-  const [month, setMonth] = React.useState(moment().format("M"))
-  const [year, setYear] = React.useState(moment().format("Y"))
-
-	const remainingFloor = (user) => {
-		let count = 0
-		Object.keys(floorItems).forEach(date => {
-			count += floorItems[date].filter(u => u.id === user.id).length
-		})
-		return user.floor - count
-	}
-
-	const remainingPol = (user) => {
-		let count = 0
-		Object.keys(polItems).forEach(date => {
-			count += polItems[date].filter(u => u.id === user.id).length
-		})
-		return user.pol - count
-	}
-
-  const handleOnDaySelect = (value) => {
-    if (selectedUser) {
-      if (value && value.floor && remainingFloor(selectedUser) > 0) {
-        const date = value.floor.format('DD/MM/YYYY')
-        setFloorItems({
-          ...floorItems,
-          [date]: [...(floorItems[date] || []), selectedUser]
-        })
-      } else if (value && value.pol && remainingPol(selectedUser) > 0) {
-        const date = value.pol.format('DD/MM/YYYY')
-        setPolItems({
-          ...polItems,
-          [date]: [...(polItems[date] || []), selectedUser]
-        })
-      }
-      setSelectedUser(null)
-    } else {
-      setSelectedDay(value)
-    }
-  }
-
   return (
-    <Context.Provider value={{
-      users, 
-      setUsers,
-      selectedUser,
-      setSelectedUser,
-      selectedDay,
-      setSelectedDay,
-      polItems,
-      setPolItems,
-      floorItems,
-      setFloorItems,
-      month,
-      setMonth,
-      year,
-      setYear,
-
-      remainingFloor,
-      remainingPol,
-    }}>
-      <Header />
-      <Calendar 
-        month={month}
-        year={year}
-        onDaySelected={handleOnDaySelect}
-        selectedDay={selectedDay}
-        items={{
-          floor: floorItems,
-          pol: polItems
-        }}
-      />
-      <Nav />
-    </Context.Provider> 
-  );
+    <Routes>
+      <Route path="setup" element={<Setup />} />
+      <Route path="main" element={<Main />} />
+      <Route path="clear" element={React.createElement(() => {
+        window.localStorage.clear()
+        return (
+          <Navigate to="/setup" replace />
+        )
+      })} />
+      <Route path="/" exact element={React.createElement(() => {
+        const users = window.localStorage.getItem('users')
+        const items = window.localStorage.getItem('items')
+        const dateItems = window.localStorage.getItem('dateItems')
+        return !users && !items && !dateItems ? (
+          <Navigate to="/setup" replace />
+        ) : (
+          <Navigate to="/main" replace />
+        )
+      })} />
+    </Routes>
+  )
 }
 
 export default App;

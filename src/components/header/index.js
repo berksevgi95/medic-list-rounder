@@ -5,28 +5,54 @@ import {
 	MdKeyboardArrowLeft,
 	MdKeyboardArrowRight
 } from 'react-icons/md';
+import { 
+	RxReset
+} from 'react-icons/rx';
+import { useNavigate } from "react-router";
 
 const Header = () => {
+
+	const navigate = useNavigate()
 
 	const {
 		selectedDay,
 		setSelectedDay,
 		selectedUser,
 		setSelectedUser,
-		floorItems,
-		setFloorItems,
-		polItems,
-		setPolItems,
 		year,
 		setYear,
 		month,
-		setMonth
+		setMonth,
+
+		dateItems,
+		items,
+		setItems
 	} = React.useContext(Context)
 
+	const listRecord = () => {
+		if (selectedDay) {
+			const selectedDayKeys = Object.keys(selectedDay)
+			return items[selectedDayKeys[0]][selectedDay[selectedDayKeys[0]].format('DD/MM/YYYY')]
+		}
+	}
+
+	const showDate = () => {
+		if (selectedDay) {
+			const selectedDayKeys = Object.keys(selectedDay)
+			return selectedDay[selectedDayKeys[0]].format('DD/MM/YYYY')
+		}
+	}
+	
 	return (
 		<header
 			style={{
-				borderBottom: '1px solid lightgray'
+				borderBottom: '1px solid lightgray',
+				position: 'fixed',
+				top: 0,
+				left: 0,
+				zIndex: 1,
+				width: '100%',
+				background: 'white'
 			}}
 		>
 			{selectedDay ? (
@@ -42,11 +68,7 @@ const Header = () => {
 							padding: "7px",
 						}}
 					>
-						{selectedDay.floor ? 
-							selectedDay.floor.format('DD/MM/YYYY') : 
-						selectedDay.pol ? 
-							selectedDay.pol.format('DD/MM/YYYY') : 
-						''}
+						{showDate()}
 					</span>
 					<div
 						style={{
@@ -55,10 +77,7 @@ const Header = () => {
 							display: 'flex'
 						}}
 					>
-						{((selectedDay.floor && floorItems[selectedDay.floor.format('DD/MM/YYYY')])
-							|| (selectedDay.pol && polItems[selectedDay.pol.format('DD/MM/YYYY')])
-							|| []
-						).map((user, i) => (
+						{(listRecord() || []).map((user, i) => (
 							<div 
 								key={i}
 								style={{
@@ -85,19 +104,16 @@ const Header = () => {
 								</span>
 								<MdClose
 									onClick={() => {
-										if (selectedDay && selectedDay.floor) {
-											const date = selectedDay.floor.format('DD/MM/YYYY')
-											setFloorItems({
-												...floorItems,
-												[date]: [...(floorItems[date] || []).filter(u => u.id !== user.id)]
-											})
-										} else if (selectedDay && selectedDay.pol) {
-											const date = selectedDay.pol.format('DD/MM/YYYY')
-											setPolItems({
-												...polItems,
-												[date]: [...(polItems[date] || []).filter(u => u.id !== user.id)]
-											})
-										}
+										const selectedDayKeys = Object.keys(selectedDay)
+										const date = selectedDay[selectedDayKeys[0]].format('DD/MM/YYYY')
+										const list = items[selectedDayKeys[0]][date]
+										setItems({
+											...items,
+											[selectedDayKeys[0]]: {
+												...items[selectedDayKeys[0]],
+												[date]: list.filter((l, j) => j !== i && l)
+											}
+										})
 									}}
 									style={{
 										padding: 7,
@@ -148,9 +164,22 @@ const Header = () => {
 					style={{
 						display: 'flex',
 						justifyContent: 'center',
-						alignItems: 'center'
+						alignItems: 'center',
+						position: 'relative'
 					}}
 				>
+					<RxReset 
+						style={{
+							fontSize: 20,
+							padding: "7px",
+							position: 'absolute',
+							left: 0,
+							top: 0
+						}}
+						onClick={() => {
+							navigate('/clear')
+						}}
+					/>
 					<MdKeyboardArrowLeft 
 						style={{
 							fontSize: 20,
