@@ -22,6 +22,12 @@ const Main = () => {
 			{}
 	)
 
+	const [conditions, _setConditions] = React.useState(
+		window.localStorage.getItem('conditions') ? 
+			JSON.parse(window.localStorage.getItem('conditions')) :
+			{}
+	)
+
 	const [selectedUser, setSelectedUser] = React.useState(null)
 	const [selectedDay, setSelectedDay] = React.useState(null)
 
@@ -78,6 +84,11 @@ const Main = () => {
 				controlTwoDayAfterItems.length > 0
 			) {
 				alert(`${selectedUser.name} kullanicisinin bu tarihte nobeti olamaz`)
+			} else if (conditions[selectedUser.name] && 
+				conditions[selectedUser.name][key] &&
+				conditions[selectedUser.name][key].find(d => moment(d).isSame(date))
+			) {
+				alert(`${selectedUser.name} kullanicisi bu tarihte musait degil`)
 			} else {
 				setItems({
 					...items,
@@ -87,7 +98,7 @@ const Main = () => {
 					}
 				})
 			}
-			setSelectedUser(null)
+			// setSelectedUser(null)
 		} else {
 			setSelectedDay(value)
 		}
@@ -101,6 +112,11 @@ const Main = () => {
 	const setUsers = (users) => {
 		_setUsers(users)
 		window.localStorage.setItem('users', JSON.stringify(users))
+	}
+
+	const setConditions = (conditions) => {
+		_setConditions(conditions)
+		window.localStorage.setItem('conditions', JSON.stringify(conditions))
 	}
 
 	const calculateRemaining = (user, dt) => {
@@ -129,7 +145,10 @@ const Main = () => {
 				items,
 				setItems,
 
-				calculateRemaining
+				calculateRemaining,
+
+				conditions,
+				setConditions
 			}}>
 				<Header />
 				<div

@@ -5,7 +5,7 @@ import {
 import { Context } from "../../App";
 import New from "./new";
 
-const Footer = ({ dateTemplate }) => {
+const Footer = () => {
 
 	const {
 		setSelectedDay,
@@ -18,7 +18,10 @@ const Footer = ({ dateTemplate }) => {
 		items,
 		setItems,
 
-		calculateRemaining
+		calculateRemaining,
+
+		conditions,
+		setConditions
 	} = React.useContext(Context)
 
 	const handleDeleteUser = (user) => (e) => {
@@ -33,6 +36,10 @@ const Footer = ({ dateTemplate }) => {
 				})
 			})
 
+			const _conditions = {...conditions}
+			delete _conditions[user.name]
+
+			setConditions(_conditions)
 			setItems(_items)
 			setUsers(users.filter(u => user.id !== u.id))
 			setSelectedUser(null)
@@ -117,7 +124,7 @@ const Footer = ({ dateTemplate }) => {
 					)
 				}) : (
 					<span style={{ color: 'grey' }}>
-						Kisi eklemek icin yandaki arti butonuna bas
+						Kisi eklemek icin yandaki arti butonuna basiniz
 					</span>
 				)}
 			</div>

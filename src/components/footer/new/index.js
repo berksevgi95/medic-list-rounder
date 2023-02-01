@@ -5,6 +5,7 @@ import {
 } from 'react-icons/md';
 import { Context } from "../../../App";
 import { v4 as uuidv4 } from 'uuid';
+import Condition from "../../condition";
 
 const New = () => {
 
@@ -13,9 +14,13 @@ const New = () => {
 		users,
 		setUsers,
 		dateItems,
+		conditions,
+		setConditions
 	} = React.useContext(Context)
 
 	const [open, setOpen] = React.useState(false)
+	const [currentConditions, setCurrentConditions] = React.useState({})
+	
 	const submitRef = React.useRef()
 
 	const handleOnSaveNewUser = (e) => {
@@ -36,9 +41,19 @@ const New = () => {
 			newUser[name] = parseInt(elements[name].value)
 		});
 
+		setConditions({
+			...conditions,
+			[newUser.name] : currentConditions
+		})
 		setUsers([...users, newUser])
 		setOpen(false)
 	}
+
+	React.useEffect(() => {
+		if (!open) {
+			setCurrentConditions({})
+		}
+	}, [open])
 
 	return (
 		<div
@@ -159,17 +174,16 @@ const New = () => {
 											name={name} 
 											required
 										/>
-										{/* <p
-											style={{ 
-												margin: 7,
-												color: 'gray'
+										<Condition 
+											roundType={name} 
+											currentConditions={currentConditions}
+											onSave={(c) => {
+												setCurrentConditions({
+													...currentConditions,
+													...c
+												})
 											}}
-											onClick={() => {
-												alert(2)
-											}}
-										>
-											Kosul eklemek icin tiklayiniz
-										</p> */}
+										/>
 									</React.Fragment>
 								)
 							})}

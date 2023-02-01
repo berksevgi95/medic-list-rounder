@@ -1,6 +1,5 @@
-import moment from "moment";
 import React from "react";
-
+import moment from "moment";
 
 const Calendar = ({
 	month,
@@ -81,7 +80,10 @@ const Calendar = ({
 					</h3>
 					{dateTemplate && dateTemplate.length > 0 && dateTemplate.map((dt, i) => {
 						const dateItems = (items[dt.name] || [])[day.format('DD/MM/YYYY')] || []
-						const selected = selectedDay && selectedDay[dt.name] && selectedDay[dt.name].isSame(day)
+						const selected = selectedDay && selectedDay[dt.name] && (selectedDay[dt.name].length !== undefined ? 
+							selectedDay[dt.name].find(d => d.isSame(day)) :
+							selectedDay[dt.name].isSame(day) 
+						)
 						return (
 							<div
 								key={i}
